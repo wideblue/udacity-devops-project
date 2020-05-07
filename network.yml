@@ -44,14 +44,14 @@ Resources:
       EnableDnsHostnames: true
       Tags: 
         - Key: Name 
-          Value: !Join [ '', [ 'Vpc / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-Vpc
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: !Join [ '', [ 'InternetGateway / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-InternetGateway
   AttachInternetGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -66,7 +66,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Join [ '', [ 'PublicSubnet0 / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-PublicSubnet0
         - Key: SubnetType
           Value: Public
       VpcId: !Ref Vpc
@@ -78,7 +78,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Join [ '', [ 'PublicSubnet1 / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-PublicSubnet1
         - Key: SubnetType
           Value: Public
       VpcId: !Ref Vpc      
@@ -91,7 +91,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Join [ '', [ 'WebSubnet0 / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-WebSubnet0
         - Key: SubnetType
           Value: Private
       VpcId: !Ref Vpc
@@ -103,7 +103,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Join [ '', [ 'WebSubnet1 / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-WebSubnet1
         - Key: SubnetType
           Value: Private
       VpcId: !Ref Vpc  
@@ -123,7 +123,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Join [ '', ['NatRouteTable0 / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-NatRouteTable0
         - Key: Network
           Value: Public
       VpcId: !Ref Vpc    
@@ -149,7 +149,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Join [ '', [ 'NatRouteTable1 / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-NatRouteTable1
         - Key: Network
           Value: Public
       VpcId: !Ref Vpc        
@@ -183,7 +183,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Join [ '', [ 'PublicRouteTable / ', !Ref 'AWS::StackName' ] ]
+          Value: !Sub ${EnvironmentName}-PublicRouteTable
         - Key: Network
           Value: Public
       VpcId: !Ref Vpc
@@ -203,21 +203,31 @@ Outputs:
     Description: A reference to the created VPC
     Value: !Ref Vpc
     Export:
-      Name: !Join [ '', [ 'VPC-', !Ref 'AWS::StackName' ] ]
+      Name: !Sub ${EnvironmentName}-VPC
   VpcCidr:
     Description: A reference to the VPC network CIDR
     Value: !Ref VpcCidr
     Export:
-      Name: !Join [ '', [ 'VPC-CIDR-', !Ref 'AWS::StackName' ] ]
-  PublicSubnet:
+      Name: !Sub ${EnvironmentName}-VPC-CIDR
+  # NOTE: I'm also exportin public subnets individualy because LB 
+  # resouce declaration need it in yaml list
+  PublicSubnet0:
+    Value: !Ref PublicSubnet0
+    Export:
+      Name: !Sub ${EnvironmentName}-PublicSubnet0
+  PublicSubnet1:
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: !Sub ${EnvironmentName}-PublicSubnet1    
+  PublicSubnets:
     Description: A list of the public subnets
     Value: !Join [ ',', [ !Ref PublicSubnet0, !Ref PublicSubnet1 ] ]  
     Export:
-      Name: !Join [ '', [ 'PUB-NETS-', !Ref 'AWS::StackName' ] ]
+      Name: !Sub ${EnvironmentName}-PUB-NETS
   WebSubnet:
     Description: A list of the privat subnets
     Value: !Join [ ',', [ !Ref WebSubnet0, !Ref WebSubnet1 ] ]
     Export:
-      Name: !Join [ '', [ 'WEB-NETS-', !Ref 'AWS::StackName' ] ]
+      Name: !Sub ${EnvironmentName}-WEB-NETS
 
  

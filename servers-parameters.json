@@ -1,0 +1,30 @@
+[
+    {
+        "ParameterKey": "EnvironmentName",
+        "ParameterValue": "UdacityProject2"
+    },
+    {
+        "ParameterKey": "SshAccessCidr",
+        "ParameterValue": "0.0.0.0/0"
+    },
+    {
+        "ParameterKey": "WebAsgMax",
+        "ParameterValue": "4"
+    },
+    {
+        "ParameterKey": "WebAsgMin",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "WebInstanceType",
+        "ParameterValue": "t2.micro"
+    },
+    {
+        "ParameterKey": "WebImageId",
+        "ParameterValue": "ami-003634241a8fcdec0"
+    },
+    {
+        "ParameterKey": "EC2KeyName",
+        "ParameterValue": "udacity-devops-us-west"
+    }
+]
