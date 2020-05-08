@@ -1,0 +1,18 @@
+[
+    {
+        "ParameterKey": "EnvironmentName",
+        "ParameterValue": "UdacityProject2"
+    },
+    {
+        "ParameterKey": "EC2KeyName",
+        "ParameterValue": "udacity-devops-us-west"
+    },
+    {
+        "ParameterKey": "BastionInstanceType",
+        "ParameterValue": "t2.nano"
+    },
+    {
+        "ParameterKey": "BastionImageId",
+        "ParameterValue": "ami-bf4193c7"
+    }
+]

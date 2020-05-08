@@ -1,0 +1,51 @@
+Description: >
+  Damjan Dvorsek / Udacity devops project 2, bastion server
+
+Parameters:
+
+  EnvironmentName:
+    Description: An Environment name that will be prefixed to resources
+    Type: String    
+  BastionInstanceType:
+    Default: t2.nano
+    Description: The Amazon EC2 instance type for your bastion instances.
+    Type: String
+  BastionImageId:
+    Default: ami-bf4193c7
+    Description: The Amazon EC2  AMI image for your bastion instances.
+    Type: String
+  EC2KeyName:
+    ConstraintDescription: Must be letters (upper or lower), numbers, and special characters.
+    Description: Name of an EC2 KeyPair. Your bastion & Web instances will launch with this KeyPair.
+    Type: AWS::EC2::KeyPair::KeyName
+
+
+Resources:
+
+  BastionAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      Cooldown: 60
+      HealthCheckGracePeriod: 120
+      # HealthCheckType: EC2
+      LaunchConfigurationName: !Ref BastionLaunchConfiguration
+      MaxSize: 1
+      MinSize: 1
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'Bastion / ', !Ref 'AWS::StackName' ] ]
+          PropagateAtLaunch: true
+      VPCZoneIdentifier:
+      - Fn::ImportValue:
+          !Sub "${EnvironmentName}-PUB-NETS"
+  BastionLaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      # IamInstanceProfile: !Ref BastionInstanceProfile
+      ImageId: !Ref BastionImageId 
+      InstanceMonitoring: true
+      InstanceType: !Ref BastionInstanceType
+      KeyName: !Ref EC2KeyName
+      SecurityGroups:
+      - Fn::ImportValue:
+          !Sub "${EnvironmentName}-BastionSecurityGroup"
