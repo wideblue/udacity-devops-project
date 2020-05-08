@@ -121,7 +121,6 @@ Resources:
           Values: [/]
         ListenerArn: !Ref 'PublicAlbListenerNoSslCertificate'
         Priority: 1
-
   PublicAlbTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -141,38 +140,38 @@ Resources:
           !Sub "${EnvironmentName}-VPC"
 
 
-  # WebInstanceProfile:
-  #   Type: AWS::IAM::InstanceProfile
-  #   Properties:
-  #     Path: /
-  #     Roles:
-  #     - !Ref WebInstanceRole
-  # WebInstanceRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     AssumeRolePolicyDocument:
-  #       Version: 2012-10-17
-  #       Statement:
-  #       - Effect: Allow
-  #         Principal:
-  #           Service:
-  #           - ec2.amazonaws.com
-  #         Action:
-  #         - sts:AssumeRole
-  #     Path: /
-  #     Policies:
-  #     - PolicyName: logs
-  #       PolicyDocument:
-  #         Version: 2012-10-17
-  #         Statement:
-  #         - Effect: Allow
-  #           Action:
-  #           - logs:CreateLogGroup
-  #           - logs:CreateLogStream
-  #           - logs:PutLogEvents
-  #           - logs:DescribeLogStreams
-  #           Resource:
-  #           - arn:aws:logs:*:*:*
+  WebInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+      - !Ref WebInstanceRole
+  WebInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: s3
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:ListBucket
+            - s3:ListBucketVersions
+            - s3:GetObject
+            - s3:GetObjectVersio
+            Resource: "*"
+            # - arn:aws:s3:*:*:*
   WebAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -203,12 +202,14 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           apt-get update -y
+          apt-get install unzip awscli -y
           apt-get install apache2 -y
           systemctl start apache2.service
           cd /var/www/html
-          echo "Udacity Demo Web Server Up and Running!" > index.html
+          aws s3 cp s3://udacity-demo-1/udacity.zip .
+          unzip -o udacity.zip
 
-      # IamInstanceProfile: !Ref WebInstanceProfile
+      IamInstanceProfile: !Ref WebInstanceProfile
       ImageId: !Ref WebImageId
       InstanceMonitoring: true
       InstanceType: !Ref WebInstanceType
@@ -221,6 +222,11 @@ Resources:
           VolumeSize: '10'
 
 Outputs:
+  PublicApplicationLoadBalancerDNSName:
+    Description: Application LoadBalancer public DNS Name.
+    Value: !Join [ "", [ "http://", !GetAtt PublicApplicationLoadBalancer.DNSName ] ]
+    Export:
+      Name: !Sub ${EnvironmentName}-PublicApplicationLoadBalancerDNSName
   BastionSecurityGroup:
     Value: !Ref BastionSecurityGroup
     Export:
